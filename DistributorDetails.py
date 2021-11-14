@@ -51,5 +51,36 @@ class User(Resource):
 
 api.add_resource(User, '/user/<string:user_ID>', '/user')
 
+par = reqparse.RequestParser()
+par.add_argument('contract_date', type=str, help='Enter date')
+par.add_argument('product_name', type=str, help='Enter product name')
+
+class Distributor(Resource):
+    def get(self, dis_ID=None):
+        if dis_ID==None:
+            return dis
+        if dis_ID in dis:
+            return dis[dis_ID]
+        abort(404, message='Distributor {} doesn\'t exist'.format(dis_ID))
+    def post(self, dis_ID):
+        if dis_ID not in dis:
+            args = par.parse_args()
+            dis[dis_ID] = args
+            return 'Distributor {} added'.format(dis_ID)
+        abort(404, message='Distributor {} is already present'.format(dis_ID))
+    def put(self, dis_ID):
+        if dis_ID in dis:
+            args = par.parse_args()
+            dis[dis_ID] = args
+            return dis[dis_ID]
+        abort(404, message='Distributor {} doesn\'t exist'.format(dis_ID))
+    def delete(self, dis_ID):
+        if dis_ID in dis:
+            del dis[dis_ID]
+            return 'Distributor {} deleted'.format(dis_ID)
+        abort(404, message='Distributor {} doesn\'t exist'.format(dis_ID))
+
+api.add_resource(Distributor, '/dis/<string:dis_ID>', '/dis')
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port='5000')

@@ -86,6 +86,78 @@ def user_func():
 def dist_func():
     i = 'D'
     while(i == 'D'):
+        di = input(
+            'Enter 1 to view Distributor Records\n' + 
+            'Enter 2 to add Distributor Records\n' + 
+            'Enter 3 to extend Distributor Contract Date\n'+
+            'Enter 4 to Cancel Distributor License\n'
+        )
+        if di == '1':
+            vi = input('Enter Distributor ID\nOR\nEnter * to view all Distributors details\n')
+            if vi == '*':
+                r = request.Request('http://127.0.0.1:5000/dis', method='GET')
+                try:
+                    res = request.urlopen(r)
+                    print(res.read())
+                except urllib.error.HTTPError as e:
+                    print(e.code, e.read())
+            else:
+                r = request.Request('http://127.0.0.1:5000/dis/{}'.format(vi), method='GET')
+                try:
+                    res = request.urlopen(r)
+                    print(res.read())
+                except urllib.error.HTTPError as e:
+                    print(e.code, e.read())
+        if di == '2':
+            if isAdmin:
+                ai = input('Enter new Distributor_ID\t')
+                r0 = request.Request('http://127.0.0.1:5000/dis/{}'.format(ai), method='GET')
+                try:
+                    r1 = request.urlopen(r0)
+                    print('Distributor {} already exists'.format(ai))
+                except urllib.error.HTTPError as e:
+                    aid = {'dis_ID' : '{}'.format(ai), 'product_name' : '{}'.format(input('Enter product name\t')), 'contract_date' : datetime.utcnow().strftime('%d-%m-%Y %H:%M:%S')}
+                    data = urllib.parse.urlencode(aid)
+                    data = data.encode('ascii')
+                    r = request.Request('http://127.0.0.1:5000/dis/{}'.format(ai), method='POST', data=data)
+                    try:
+                        res = request.urlopen(r)
+                        print(res.read())
+                    except urllib.error.HTTPError as e:
+                        print(e.code, e.read())
+            else:
+                print('ONLY ADMIN CAN ADD DISTRIBUTOR RECORDS')
+        if di == '3':
+            if isAdmin:
+                ci = input('Enter the Distributor_ID to extend contract\t')
+                r0 = request.Request('http://127.0.0.1:5000/dis/{}'.format(ci), method='GET')
+                try:
+                    r1 = request.urlopen(r0)
+                    cd = datetime.utcnow().strftime('%d-%m-%Y %H:%M:%S')
+                    did = {'contract_date' : '{}'.format(cd)}
+                    data = urllib.parse.urlencode(did)
+                    data = data.encode('ascii')
+                    r = request.Request('http://127.0.0.1:5000/dis/{}'.format(ci), method='PUT', data=data)
+                    try:
+                        res = request.urlopen(r)
+                        print(res.read())
+                    except urllib.error.HTTPError as e:
+                        print('Distributor {} doesn\'t exist'.format(ci))
+                except urllib.error.HTTPError as e:
+                    print('Distributor {} doesn\'t exist'.format(ci))
+            else:
+                print('ONLY ADMIN CAN EXTEND DISTRIBUTOR CONTRACT DATE')
+        if di == '4':
+            if isAdmin:
+                di = input('Enter the Distributor_ID to cancel License\t')
+                r = request.Request('http://127.0.0.1:5000/dis/{}'.format(di), method='DELETE')
+                try:
+                    res = request.urlopen(r)
+                    print(res.read())
+                except urllib.error.HTTPError as e:
+                    print(e.code, e.read())
+            else:
+                print('ONLY ADMIN CAN CANCEL DISTRIBUTOR LICENSE')
         i = input('Press D to view Distributor Details or E to Exit\t')
 
 if(curr_user == ''):
